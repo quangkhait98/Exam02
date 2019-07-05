@@ -26,20 +26,17 @@ const run = async (numConcurrentTasks, getTask) => {
     task().then(function()
     {
       var taskNextinner= getTask();
-      taskNextinner().then(function()
+      return taskNextinner()
+    }).then(function()
     {
       var taskNextinner= getTask();
-      taskNextinner().then(function()
-    {
+      return taskNextinner()
+    }).then(function(){
       var taskNextinner= getTask();
       if(taskNextinner!=null)
       {
         taskNextinner();
-      }else
-      {
       }
-    });
-    });
     });
   }
     var taskNext=null;
