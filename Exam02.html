@@ -36,10 +36,10 @@ const run = async (numConcurrentTasks, getTask) => {
     });
 
     async function recursion(taskNext){
-      if(taskNext!==null){
+      if(taskNext!==undefined){
         await taskNext().then(async function(){
           let taskNext=getTask();
-          if(taskNext!==null)
+          if(taskNext!==undefined)
           {
               await recursion(taskNext);
           }
