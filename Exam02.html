@@ -20,34 +20,32 @@ const run = async (numConcurrentTasks, getTask) => {
   // - At the first step: the task 1, 2, 3 must start immediately.
   // - If any task is done, the next task musts start immediately.
   // - After the last task starts, there must be no more queueing up.
-  
-  for (let i = 0; i < numConcurrentTasks-1; i++) {
-  const task= getTask();
-    task().then(function()
+    let promises=[];
+    for(let i=0;i<numConcurrentTasks;i++)
     {
-      var taskNextinner= getTask();
-      return taskNextinner()
-    }).then(function()
-    {
-      var taskNextinner= getTask();
-      return taskNextinner()
-    }).then(function(){
-      var taskNextinner= getTask();
-      if(taskNextinner!=null)
-      {
-        taskNextinner();
-      }
+        let taskNext = getTask();
+        promises.push(taskNext());
+    }
+    await Promise.all(promises.map(function(item){
+      return item.then(async () => {
+        let taskNext=getTask();    
+          await recursion(taskNext); 
+      });
+    })).then(()=>{
+
     });
-  }
-    var taskNext=null;
-    do{
-      taskNext=getTask();
-      if(taskNext!=null)
-      {
-        await taskNext();
+
+    async function recursion(taskNext){
+      if(taskNext!==null){
+        await taskNext().then(async function(){
+          let taskNext=getTask();
+          if(taskNext!==null)
+          {
+              await recursion(taskNext);
+          }
+        });
       }
-    }while(taskNext!=null)
-   
+    }
 };
 
 /**
